@@ -38,7 +38,7 @@ projeto-terapia/
 1. Clone o repositório
 
 ```bash
-git clone https://github.com/terapia-app/terapia-app.git
+git clone https://github.com/ianfelix/projeto-I-MATA60-BD.git
 cd terapia-app
 ```
 
