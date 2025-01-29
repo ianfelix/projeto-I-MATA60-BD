@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mongodb-primary:
+    image: mongo:latest
+    container_name: mongodb-primary
+    command: mongod --replSet rs0 --bind_ip_all
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data_primary:/data/db
+      - ./scripts:/scripts
+    networks:
+      - mongodb_network
+
+  mongodb-secondary:
+    image: mongo:latest
+    container_name: mongodb-secondary
+    command: mongod --replSet rs0 --bind_ip_all
+    depends_on:
+      - mongodb-primary
+    ports:
+      - '27018:27017'
+    volumes:
+      - mongodb_data_secondary:/data/db
+    networks:
+      - mongodb_network
+
+  mongodb-arbiter:
+    image: mongo:latest
+    container_name: mongodb-arbiter
+    command: mongod --replSet rs0 --bind_ip_all
+    depends_on:
+      - mongodb-primary
+    ports:
+      - '27019:27017'
+    networks:
+      - mongodb_network
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    depends_on:
+      - mongodb-primary
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb-primary
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+    ports:
+      - '8081:8081'
+    networks:
+      - mongodb_network
+
+volumes:
+  mongodb_data_primary:
+  mongodb_data_secondary:
+
+networks:
+  mongodb_network:
+    driver: bridge
